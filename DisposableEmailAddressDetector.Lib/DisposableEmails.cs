@@ -22,17 +22,18 @@ namespace DisposableEmailAddressDetector.Lib
             var endpointAddress =
                 new EndpointAddress("http://api.nameapi.org:80/soap/v4.0/email/disposableemailaddressdetector");
 
-            var client = new SoapDisposableEmailAddressDetectorClient(basicHttpBinding, endpointAddress);
-            client.Endpoint.Behaviors.Add(new EndpointBehavior());
-
-            var context = new soapContext
+            using (var client = new SoapDisposableEmailAddressDetectorClient(basicHttpBinding, endpointAddress))
             {
-                //Tip: get your API key here: http://www.nameapi.org/en/register/
-                apiKey = nameApiKey
-            };
-            var result = client.isDisposable(context, email);
+                client.Endpoint.Behaviors.Add(new EndpointBehavior());
 
-            return result.disposable.ToString().Equals("yes", StringComparison.OrdinalIgnoreCase);
+                var context = new soapContext
+                {
+                    //Tip: get your API key here: http://www.nameapi.org/en/register/
+                    apiKey = nameApiKey
+                };
+                var result = client.isDisposable(context, email);
+                return result.disposable.ToString().Equals("yes", StringComparison.OrdinalIgnoreCase);
+            }
         }
     }
 }
